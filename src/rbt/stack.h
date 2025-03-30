@@ -1,7 +1,6 @@
 //just a little stack implementnion , will use it in RBT
+#pragma once
 
-#ifndef STACK_CLASS_H
-#define STACK_CLASS_H
 namespace data_structures {
     template<typename T>
     class stack{
@@ -18,6 +17,43 @@ namespace data_structures {
             start=nullptr;
             size=0;
         }
+        stack(stack &&other) noexcept {
+            this->size = other.size;
+            other.size = 0;
+            this->start = other.start;
+            other.start = nullptr;
+        }   
+        
+        stack& operator=(const stack& other) {
+            while (size > 0) pop(nullptr);
+            if (!other.start) {
+                return *this;
+            }
+            stack<T*> tempStack;
+            node* tempNode = other.start;
+            
+            while (tempNode->prev) {
+                tempStack.push(&tempNode->data);
+                tempNode = tempNode->prev;
+            }
+
+            while (!tempStack.empty()) {
+                T* temp;
+                tempStack.pop(&temp);
+                this->push(*temp);
+            }
+            
+            return *this;
+        }
+        
+        stack& operator=(stack&& other) noexcept {
+          (*this)=other;
+        }// MoveConstructable 
+
+        stack(const stack &other) 
+        { 
+            (*this)=other;
+        } // CopyConstructable (LegacyIterator)
         ~stack(){
             while(size>0){
                 pop(nullptr);
@@ -45,7 +81,7 @@ namespace data_structures {
         size_t getSize(){
             return size;
         }
-        T* peek(){
+        T* peek()const {
             if(!start)
                 return nullptr;
             return &start->data;
@@ -56,5 +92,3 @@ namespace data_structures {
     };
 
 }
-
-#endif

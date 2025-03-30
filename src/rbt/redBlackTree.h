@@ -67,7 +67,8 @@ namespace data_structures
 		};
 
 		constexpr node* getRoot(){
-			return root;
+			node* temp=root;
+			return temp;
 		};
 
 		node *getNode(dataPoint &value){ // Gets a node with the given data
@@ -208,7 +209,7 @@ namespace data_structures
             return true;
 		}
 	
-	private:
+	// private:
 		struct node *root = nullptr;
 
 		Color color(node *node_){
