@@ -112,13 +112,13 @@ namespace std_selfmade
                 rightMostNode = other.rightMostNode;
                 this->iterStack = other.iterStack;
 
-                other.status = status;//null out 
-                other.leftIsWalked = leftIsWalked;
-                other.rightIsWalked = rightIsWalked;
-                other.outputDone = outputDone;
-                other.isFirstMove = isFirstMove;
-                other.leftMostNode = leftMostNode;
-                other.rightMostNode = rightMostNode;
+                other.status = noData;//null out 
+                other.leftIsWalked = false;
+                other.rightIsWalked = false;
+                other.outputDone = false;
+                other.isFirstMove = false;
+                other.leftMostNode = false;
+                other.rightMostNode = false;
                 return *this;
             } // MoveConstructible
 
@@ -340,15 +340,13 @@ namespace std_selfmade
             requires isComparable<Key> // the only point where user can select the type
         {
         }
-        map(const map &other)
+        map(const map &other): tree(other.tree)
         {
             elementCount=other.elementCount;
-            tree=other.tree;
         } // copy constructor
-        map(map &&other)
+        map(map &&other) : tree(other.tree)
         {
             elementCount=other.elementCount;
-            tree(other.tree);
         } // move consructor
         map &operator=(const map &other)
         {

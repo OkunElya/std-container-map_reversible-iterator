@@ -1,8 +1,4 @@
-
-#include <iostream>
-#include "redBlackTree.h"
-#include "map.h"
-
+#include <container_map/map.h> 
 int main()
 {
 	std_selfmade::map<int,int> test;
@@ -10,12 +6,8 @@ int main()
 		test.put(std::pair<int,int>(i,i));
 	}
 	
-	// // std::cout<<a.value().second<<"\n";
-	// auto b=test.rbegin();
-	// auto e=test.rend();
-	// std::swap(e,b);
 	auto test1(test);
-	// std::cout<<(*(--b)).first<<"  "<<(*e).first<<"\n";
+
 	for(auto a :test)
 	{
 		std::cout<<a<<"\n";
@@ -24,6 +16,8 @@ int main()
 	{
 		std::cout<<a<<"\n";
 	}
+
+
 	std::cout<< test[2]<<"\n";
 	test[2]=3;
 	std::cout<< test[2]<<"\n";

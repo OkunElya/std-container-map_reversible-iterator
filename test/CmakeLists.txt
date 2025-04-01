@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.15)
+project(container_map_test VERSION 0.0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+
+set(CONTAINER_MAP_ROOT "C:/Program Files (x86)/container_map")
+
+if(WIN32)
+    set(INC_PATH "${CONTAINER_MAP_ROOT}/include")
+    set(LIB_PATH "${CONTAINER_MAP_ROOT}/lib/container_map")
+    set(DLL_PATH "${CONTAINER_MAP_ROOT}/bin")
+    
+    add_library(container_map SHARED IMPORTED)
+    set_target_properties(container_map PROPERTIES
+        IMPORTED_IMPLIB "${LIB_PATH}/libcontainer_map.dll.a"
+        IMPORTED_LOCATION "${DLL_PATH}/libcontainer_map.dll"
+        INTERFACE_INCLUDE_DIRECTORIES "${INC_PATH}"
+    )
+else()
+    find_package(container_map REQUIRED)# on linux it's just easier
+endif()
+
+add_executable(container_map_test main.cpp)
+
+if(WIN32)
+    target_link_libraries(container_map_test PRIVATE container_map)
+else()
+    target_link_libraries(container_map_test PRIVATE container_map::container_map)
+endif()

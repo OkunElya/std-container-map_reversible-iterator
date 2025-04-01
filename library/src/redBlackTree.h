@@ -4,7 +4,6 @@
 #include <iostream>
 #include <type_traits> //for concepts usage
 #include <string>
-// #include "map.h"
 #include "stack.h"
 
 template <typename T>
@@ -573,7 +572,7 @@ namespace data_structures
 			this->root = nullptr;
 		} // constructor
 
-		RedBlackTree(RedBlackTree &&other)
+		RedBlackTree(RedBlackTree<dataPoint> &&other)
 		{
 			this->root = other.root; // just transfer root node
 			other.root = nullptr;
