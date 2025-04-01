@@ -23,7 +23,7 @@ namespace std_selfmade
         class iteratorBase
         { // has to be bidirectional
         private:
-            enum statuses {notOnEdge,preLeft,postRight};
+            enum statuses {notOnEdge,preLeft,postRight,noData};
             statuses status=notOnEdge;
             bool leftIsWalked = false;
             bool rightIsWalked = false;
@@ -44,12 +44,18 @@ namespace std_selfmade
             } // DefaultConstructible
             iteratorBase(pointer p)
             {
-                if(!p){
-                   throw "Bad node for iterator init!";
-                }
+
                 typename data_structures::RedBlackTree<treeNode>::node* nodePtr = p->treeNodePtr;
                 data_structures::stack<typename data_structures::RedBlackTree<treeNode>::node *> tempStack;
-
+                if(!p){
+                    throw "bad node for iter init";
+                }
+                else if (!p->treeNodePtr){
+                    //case for initializing in empty map
+                    status=noData;
+                    return;
+                }
+                
                 tempStack.push(nodePtr);
                 while (nodePtr->parent)
                 {
@@ -147,6 +153,9 @@ namespace std_selfmade
 
             iteratorBase &operator++() // prefix
             {
+                if(status==noData){
+                    return (*this);
+                }
                 if(rightMostNode==(*iterStack.peek())){//developer is not a child... in some update i'll allow only one chance for mistake and after second bad move iterator will throw error
                     status=postRight;//prevent iterator from going further
                     return (*this);
@@ -234,6 +243,9 @@ namespace std_selfmade
 
             iteratorBase &operator--() // prefix
             {
+                if(status==noData){
+                    return (*this);
+                }
                 if(leftMostNode==(*iterStack.peek())){//developer is not a child... in some update i'll allow only one chance for mistake and after second bad move iterator will throw error
                     status=preLeft;//prevent iterator from going further
                     return (*this);
@@ -320,6 +332,9 @@ namespace std_selfmade
         using size_type = size_t;
         using pointer = node *;
 
+
+        
+
     public:
         map()
             requires isComparable<Key> // the only point where user can select the type
@@ -327,39 +342,46 @@ namespace std_selfmade
         }
         map(const map &other)
         {
-            tree(other.tree);
+            elementCount=other.elementCount;
+            tree=other.tree;
         } // copy constructor
         map(map &&other)
         {
+            elementCount=other.elementCount;
             tree(other.tree);
         } // move consructor
         map &operator=(const map &other)
         {
+            elementCount=other.elementCount;
             tree(other.tree);
             return this;
         }
         map &operator=(map &&other)
         {
+            elementCount=other.elementCount;
             tree(other.tree);
             return this;
         }
 
         iterator begin()
         {
-
             typename data_structures::RedBlackTree<treeNode>::node *treeTemp = tree.getRoot();
-            while (treeTemp->left)
-            {
-                treeTemp = treeTemp->left;
+            if(treeTemp){
+                while (treeTemp->left)
+                {
+                    treeTemp = treeTemp->left;
+                }
             }
             node tempOut;
             tempOut.treeNodePtr = treeTemp;
             return iterator(&tempOut);
         }
         const_iterator begin() const {  typename data_structures::RedBlackTree<treeNode>::node *treeTemp = tree.getRoot();
-            while (treeTemp->left)
-            {
-                treeTemp = treeTemp->left;
+            if(treeTemp){
+                while (treeTemp->left)
+                {
+                    treeTemp = treeTemp->left;
+                }
             }
             node tempOut;
             tempOut.treeNodePtr = treeTemp;
@@ -372,9 +394,11 @@ namespace std_selfmade
         iterator end()
         {
             typename data_structures::RedBlackTree<treeNode>::node *treeTemp = tree.getRoot();
-            while (treeTemp->right)
-            {
-                treeTemp = treeTemp->right;
+            if(treeTemp){
+                while (treeTemp->right)
+                {
+                    treeTemp = treeTemp->right;
+                }
             }
             node temp;
             temp.treeNodePtr = treeTemp;
@@ -384,9 +408,11 @@ namespace std_selfmade
         const_iterator cend()
         {
             typename data_structures::RedBlackTree<treeNode>::node *treeTemp = tree.getRoot();
-            while (treeTemp->right)
-            {
-                treeTemp = treeTemp->right;
+                if(treeTemp){
+                while (treeTemp->right)
+                {
+                    treeTemp = treeTemp->right;
+                }
             }
             node temp;
             temp.treeNodePtr = treeTemp;
@@ -435,7 +461,7 @@ namespace std_selfmade
         {
             return size() == 0;
         }
-        std::optional<node> get(Key temp)
+        std::optional<node> find(Key temp)
         {
             treeNode toFind;
             toFind.first = temp;
@@ -458,13 +484,27 @@ namespace std_selfmade
 
         bool pop(Key key)
         {
-            auto temp=get(key);
+            auto temp=find(key);
             if(temp){
                 elementCount--;
                 tree.remove(temp);
                 return true;
             }
             return false;
+        }
+        T& operator[](const Key& key){
+            treeNode temp;
+            treeNode* tempAddr;
+            temp.first=key;
+            typename data_structures::RedBlackTree<treeNode>::node* toFind=tree.getNode(temp);
+            if(!toFind){
+                //requested node doesen't exist
+                tempAddr=tree.insert(temp);
+            }   
+            else{
+                tempAddr=&(toFind->data);
+            }
+            return (tempAddr->second);
         }
 
         ~map() {} // tree is destructed automaticly, all freeing is handled there
@@ -475,6 +515,11 @@ namespace std_selfmade
         {
         public:
             data_structures::RedBlackTree<treeNode>::node *treeNodePtr = nullptr;
+            friend std::ostream& operator << (std::ostream& os, const node& temp) 
+            {
+                os<<"("<<temp.first<<" , "<<temp.second<<")";
+                return os;
+            }
             // let's assume that it always points to the node in the tree
         };
 
@@ -494,7 +539,8 @@ namespace std_selfmade
                 return this->first > other.first;
             }
         };
-
+       
         data_structures::RedBlackTree<treeNode> tree;
     };
 }
+

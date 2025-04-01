@@ -50,7 +50,7 @@ namespace data_structures {
           (*this)=other;
         }// MoveConstructable 
 
-        stack(const stack &other) 
+        stack(const stack &other) noexcept
         { 
             (*this)=other;
         } // CopyConstructable (LegacyIterator)
