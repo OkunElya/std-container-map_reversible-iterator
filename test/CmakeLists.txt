@@ -26,8 +26,4 @@ endif()
 
 add_executable(container_map_test main.cpp)
 
-if(WIN32)
-    target_link_libraries(container_map_test PRIVATE container_map)
-else()
-    target_link_libraries(container_map_test PRIVATE container_map)
-endif()
+target_link_libraries(container_map_test PRIVATE container_map)
